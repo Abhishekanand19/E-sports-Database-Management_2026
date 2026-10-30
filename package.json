@@ -12,7 +12,8 @@
     "user:create": "tsx scripts/create-user.ts",
     "test:db": "tsx --test tests/database.test.ts",
     "test:api": "tsx --test tests/api.test.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:cache": "tsx --test tests/cache.test.ts"
   },
   "dependencies": {
     "next": "^15.5.28",
