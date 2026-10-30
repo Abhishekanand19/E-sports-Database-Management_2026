@@ -1,0 +1,62 @@
+name: Verify DBMS application
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: esports_test
+          POSTGRES_USER: esports
+          POSTGRES_PASSWORD: ci-${{ github.run_id }}-${{ github.run_attempt }}
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U esports -d esports_test"
+          --health-interval 5s --health-timeout 3s --health-retries 15
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-retries 15
+    env:
+      DATABASE_URL: postgresql://esports:ci-${{ github.run_id }}-${{ github.run_attempt }}@127.0.0.1:5432/esports_test
+      REDIS_URL: redis://127.0.0.1:6379
+      APP_ORIGIN: http://localhost:3000
+      NEXT_TELEMETRY_DISABLED: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run db:seed
+      - run: npm run db:seed
+      - run: npm run typecheck
+      - run: npm run test:db
+      - run: npm run test:cache
+      - run: npm audit --audit-level=high
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Start production application
+        run: |
+          npm run start > server.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://localhost:3000/login > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat server.log
+          exit 1
+      - run: npm run test:api
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-evidence
+          path: |
+            playwright-report
+            test-results
+            docs/screenshots
