@@ -1,3 +1,4 @@
+import ActionButton from "@/components/ActionButton";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import EntityForm from "@/components/EntityForm";
@@ -28,15 +29,15 @@ export default async function TournamentDetailPage({ params }: { params: Promise
 
       <h2>Standings</h2>
       <table>
-        <thead><tr><th>Position</th><th>Team</th></tr></thead>
+        <thead><tr><th>Position</th><th>Team</th><th>Played</th><th>Wins</th><th>Losses</th><th>Points</th><th>Actions</th></tr></thead>
         <tbody>
           {data.teams.map((row: any) => (
             <tr key={row.team_name}>
-              <td>{row.final_position ?? "-"}</td>
-              <td>{row.team_name}</td>
+              <td>{row.final_position ?? "Provisional"}</td>
+              <td>{row.team_name}</td><td>{row.played}</td><td>{row.wins}</td><td>{row.losses}</td><td>{row.points}</td><td><ActionButton endpoint="/api/participations" payload={{tournament_id:tournamentId,team_id:row.team_id}} label="Unregister team"/></td>
             </tr>
           ))}
-          {data.teams.length === 0 && <tr><td colSpan={2} className="muted">No teams registered.</td></tr>}
+          {data.teams.length === 0 && <tr><td colSpan={7} className="muted">No teams registered.</td></tr>}
         </tbody>
       </table>
 

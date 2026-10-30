@@ -1,3 +1,4 @@
+import RecordActions from "@/components/RecordActions";
 import Link from "next/link";
 import EntityForm from "@/components/EntityForm";
 import { listTournaments, getLookups } from "@/lib/queries";
@@ -17,7 +18,7 @@ export default async function TournamentsPage() {
 
       <table>
         <thead>
-          <tr><th>Name</th><th>Game</th><th>Dates</th><th>Prize pool</th><th>Teams</th></tr>
+          <tr><th>Name</th><th>Game</th><th>Dates</th><th>Prize pool</th><th>Teams</th><th>Actions</th></tr>
         </thead>
         <tbody>
           {tournaments.map((t: any) => (
@@ -27,6 +28,7 @@ export default async function TournamentsPage() {
               <td>{t.start_date} to {t.end_date}</td>
               <td>${Number(t.prize_pool).toLocaleString()}</td>
               <td>{t.teams}</td>
+              <td><RecordActions resource="tournaments" record={t} /></td>
             </tr>
           ))}
         </tbody>

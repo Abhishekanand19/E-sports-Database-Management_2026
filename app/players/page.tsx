@@ -1,5 +1,5 @@
+import RecordActions from "@/components/RecordActions";
 import EntityForm from "@/components/EntityForm";
-import DeleteButton from "@/components/DeleteButton";
 import { listPlayers } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
@@ -37,7 +37,7 @@ export default async function PlayersPage({
                 <td>{p.country}</td>
                 <td>{p.role}</td>
                 <td>{p.date_of_birth}</td>
-                <td><DeleteButton url={`/api/players/${p.player_id}`} /></td>
+                <td><RecordActions resource="players" record={p} /></td>
               </tr>
             ))}
             {players.length === 0 && (

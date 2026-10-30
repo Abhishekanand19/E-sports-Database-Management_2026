@@ -1,3 +1,5 @@
+import DeleteButton from "@/components/DeleteButton";
+import ActionButton from "@/components/ActionButton";
 import EntityForm from "@/components/EntityForm";
 import { listMatches, getLookups } from "@/lib/queries";
 
@@ -13,7 +15,7 @@ export default async function MatchesPage() {
 
       <table>
         <thead>
-          <tr><th>#</th><th>Tournament</th><th>Round</th><th>Date</th><th>Winner</th><th>Loser</th><th>Score</th></tr>
+          <tr><th>#</th><th>Tournament</th><th>Round</th><th>Date</th><th>Winner</th><th>Loser</th><th>Score</th><th>Opponents</th><th>Actions</th></tr>
         </thead>
         <tbody>
           {matches.map((m: any) => (
@@ -24,7 +26,7 @@ export default async function MatchesPage() {
               <td>{m.match_date}</td>
               <td>{m.winner ?? <span className="muted">pending</span>}</td>
               <td>{m.loser ?? "-"}</td>
-              <td>{m.score ?? "-"}</td>
+              <td>{m.score ?? "-"}</td><td>{m.opponents}</td><td><DeleteButton url={`/api/matches/${m.match_id}`} label="Cancel match"/>{m.score&&<ActionButton endpoint="/api/results" payload={{match_id:m.match_id}} label="Clear result"/>}</td>
             </tr>
           ))}
         </tbody>
@@ -38,6 +40,8 @@ export default async function MatchesPage() {
             { name: "tournament_id", label: "Tournament", type: "select", numeric: true, options: lookups.tournaments },
             { name: "match_date", label: "Match date", type: "date" },
             { name: "round", label: "Round (e.g. Quarterfinal)" },
+            {name:"team_a",label:"Opponent A (registered team)",type:"select",numeric:true,options:lookups.teams},
+            {name:"team_b",label:"Opponent B (registered team)",type:"select",numeric:true,options:lookups.teams},
           ]}
         />
         <EntityForm
