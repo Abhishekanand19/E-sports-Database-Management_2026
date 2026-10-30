@@ -1,9 +1,11 @@
 import { pool } from "./db";
 import { cachedQuery } from "./cache";
+import { pageUser } from "./auth";
 
 // Dates are cast to text in SQL so they reach the browser as plain "YYYY-MM-DD" strings.
 
-export function getDashboardCounts() {
+export async function getDashboardCounts() {
+  await pageUser();
   return cachedQuery("dashboard", 60, async () => {
     const r = await pool.query(`
       SELECT (SELECT COUNT(*)::int FROM PLAYER)     AS players,
@@ -14,7 +16,8 @@ export function getDashboardCounts() {
   });
 }
 
-export function listPlayers(q: string) {
+export async function listPlayers(q: string) {
+  await pageUser();
   return cachedQuery(`players:${q.toLowerCase()}`, 60, async () => {
     const r = await pool.query(
       `SELECT player_id, username, country, role, date_of_birth::text AS date_of_birth
@@ -27,7 +30,8 @@ export function listPlayers(q: string) {
   });
 }
 
-export function listTeams() {
+export async function listTeams() {
+  await pageUser();
   return cachedQuery("teams", 60, async () => {
     const r = await pool.query(`
       SELECT t.team_id, t.team_name, t.country, t.founded_date::text AS founded_date,
@@ -43,10 +47,11 @@ export function listTeams() {
   });
 }
 
-export function listTournaments() {
+export async function listTournaments() {
+  await pageUser();
   return cachedQuery("tournaments", 60, async () => {
     const r = await pool.query(`
-      SELECT t.tournament_id, t.name, g.title AS game,
+      SELECT t.tournament_id, t.name, t.game_id, g.title AS game,
              t.start_date::text AS start_date, t.end_date::text AS end_date,
              t.prize_pool::float AS prize_pool,
              (SELECT COUNT(*)::int FROM PARTICIPATES_IN pi WHERE pi.tournament_id = t.tournament_id) AS teams
@@ -56,7 +61,8 @@ export function listTournaments() {
   });
 }
 
-export function getTournamentDetail(id: number) {
+export async function getTournamentDetail(id: number) {
+  await pageUser();
   return cachedQuery(`tournament:${id}`, 60, async () => {
     const [tour, teams, matches] = await Promise.all([
       pool.query(
@@ -65,10 +71,7 @@ export function getTournamentDetail(id: number) {
          FROM TOURNAMENT t JOIN GAME g ON g.game_id = t.game_id
          WHERE t.tournament_id = $1`, [id]),
       pool.query(
-        `SELECT te.team_name, pi.final_position
-         FROM PARTICIPATES_IN pi JOIN TEAM te ON te.team_id = pi.team_id
-         WHERE pi.tournament_id = $1
-         ORDER BY pi.final_position NULLS LAST, te.team_name`, [id]),
+        `SELECT * FROM tournament_standings WHERE tournament_id=$1 ORDER BY points DESC, wins DESC, team_name`, [id]),
       pool.query(
         `SELECT m.match_id, m.round, m.match_date::text AS match_date, r.score,
                 w.team_name AS winner, l.team_name AS loser
@@ -83,10 +86,12 @@ export function getTournamentDetail(id: number) {
   });
 }
 
-export function listMatches() {
+export async function listMatches() {
+  await pageUser();
   return cachedQuery("matches", 60, async () => {
     const r = await pool.query(`
       SELECT m.match_id, t.name AS tournament, m.round, m.match_date::text AS match_date,
+             (SELECT string_agg(te.team_name, ' vs ' ORDER BY te.team_name) FROM MATCH_TEAM mt JOIN TEAM te USING(team_id) WHERE mt.match_id=m.match_id) AS opponents,
              w.team_name AS winner, l.team_name AS loser, r.score
       FROM MATCH m
       JOIN TOURNAMENT t ON t.tournament_id = m.tournament_id
@@ -98,27 +103,20 @@ export function listMatches() {
   });
 }
 
-export function getPlayerStats() {
-  return cachedQuery("stats", 60, async () => {
-    const r = await pool.query(`
-      SELECT p.username,
-             COUNT(s.match_id)::int          AS matches,
-             SUM(s.kills)::int               AS kills,
-             SUM(s.deaths)::int              AS deaths,
-             SUM(s.assists)::int             AS assists,
-             ROUND(AVG(s.rating), 2)::float  AS avg_rating,
-             CASE WHEN SUM(s.deaths) = 0 THEN SUM(s.kills)::float
-                  ELSE ROUND(SUM(s.kills)::numeric / SUM(s.deaths), 2)::float END AS kd
-      FROM PLAYER_MATCH_STATS s
-      JOIN PLAYER p ON p.player_id = s.player_id
-      GROUP BY p.player_id, p.username
-      ORDER BY avg_rating DESC NULLS LAST`);
-    return r.rows;
-  });
+export async function getPlayerStats(tournamentId:number|null=null) {
+ await pageUser();
+ return cachedQuery(`stats:${tournamentId}`,60,async()=> (await pool.query('SELECT * FROM player_performance($1)',[tournamentId])).rows);
+}
+
+export async function listRoster() {
+ await pageUser();
+ return (await pool.query(`SELECT tm.*,tm.join_date::text AS join_date,tm.leave_date::text AS leave_date,p.username,t.team_name
+ FROM TEAM_MEMBER tm JOIN PLAYER p USING(player_id) JOIN TEAM t USING(team_id) ORDER BY t.team_name,p.username,tm.join_date`)).rows;
 }
 
 /** Dropdown options for the forms; cached for longer because they change rarely. */
-export function getLookups() {
+export async function getLookups() {
+  await pageUser();
   return cachedQuery("lookups", 120, async () => {
     const [games, teams, players, tournaments, matches] = await Promise.all([
       pool.query(`SELECT game_id AS value, title AS label FROM GAME ORDER BY title`),
