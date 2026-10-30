@@ -35,6 +35,8 @@ INSERT INTO MATCH (tournament_id, match_date, round) VALUES
   (1, '2026-08-12', 'Semifinal'),
   (2, '2026-10-03', 'Group Stage');
 
+INSERT INTO MATCH_TEAM(match_id, team_id) VALUES (1,1),(1,2),(2,1),(2,3),(3,3),(3,4);
+
 INSERT INTO RESULT (match_id, winning_team_id, losing_team_id, score) VALUES
   (1, 1, 2, '13-7'),
   (2, 1, 3, '13-11'),
