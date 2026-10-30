@@ -1,0 +1,29 @@
+# Data dictionary
+
+Identifiers from the original schema are unquoted PostgreSQL names and appear in lower case in the catalog. `serial`/`bigserial` identifiers are generated. See executable SQL for complete type widths and checks.
+
+| Table              | Key                           | Attributes and relations                                                                                                                                                                      |
+| ------------------ | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| PLAYER             | player_id                     | Unique nonblank username; country, game role, nonfuture date_of_birth                                                                                                                         |
+| TEAM               | team_id                       | Unique nonblank team_name; country; optional founded_date                                                                                                                                     |
+| TEAM_MEMBER        | player_id, team_id, join_date | Player/team FKs; temporal membership, active/inactive status, optional leave_date. Active means no leave date; inactive requires one. Membership intervals are inclusive and may not overlap. |
+| GAME               | game_id                       | Unique title, developer, genre; tournament reference data                                                                                                                                     |
+| TOURNAMENT         | tournament_id                 | Name, game FK, start_date <= end_date, nonnegative prize_pool                                                                                                                                 |
+| PARTICIPATES_IN    | tournament_id, team_id        | Registered team; nullable positive final_position, unique per tournament and bounded by registered count                                                                                      |
+| MATCH              | match_id                      | Tournament FK, valid match_date inside tournament interval, nonblank round                                                                                                                    |
+| MATCH_TEAM         | match_id, team_id             | Two registered opponents per match; match cascade, team restrict                                                                                                                              |
+| RESULT             | match_id                      | One result per match; distinct scheduled winner/loser, winner-first score, recorded_at                                                                                                        |
+| PLAYED_BY          | match_id, team_id, player_id  | Player belongs to team on match date; unique match/player; scheduled opponent FK                                                                                                              |
+| PLAYER_MATCH_STATS | match_id, player_id           | Participation FK; nonnegative kills/deaths/assists/damage; nullable 0..9.99 rating                                                                                                            |
+| app_user           | user_id                       | Unique normalized username; salted password_hash; admin/viewer role; created_at                                                                                                               |
+| app_session        | token_hash                    | SHA-256 token digest, user FK, absolute expires_at                                                                                                                                            |
+| login_attempt      | username                      | Failed/attempt count and 15-minute window start                                                                                                                                               |
+| audit_log          | audit_id                      | Result operation, timestamp, old/new JSON values; excludes passwords/session tokens                                                                                                           |
+| cache_revision     | singleton                     | One authoritative monotonic version for cache generations                                                                                                                                     |
+| schema_migrations  | name                          | Applied SQL filename and applied_at; maintained by migration runner                                                                                                                           |
+
+`tournament_standings` is a view, not a persisted placement table. `player_performance(tid)` is a stable SQL function. `schedule_match(tid,date,round,team_a,team_b)` is a transactional PL/pgSQL function.
+
+Deleting a player cascades its participation/stat rows and memberships, subject to roster-history checks. Deleting a fixture removes its results/played-by/statistics/opponents. Team registration and roster deletion are deliberately restricted while dependent history exists. Remove dependent matches/participation first; do not bypass triggers. Team deletion is also restricted by scheduled opponents and recorded results. Tournament deletion may require explicit fixture removal before unregistering teams because integrity triggers protect those dependencies.
+
+Redis stores only derived query/leaderboard data. Its JSON and sorted-set representations, namespace, expiration, revision invalidation and score semantics are documented in `PROJECT_REPORT.md`.

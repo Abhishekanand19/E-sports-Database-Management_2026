@@ -1,4 +1,6 @@
 node_modules/
+dump.rdb
+appendonlydir/
 .next/
 .env.local
 *.log
