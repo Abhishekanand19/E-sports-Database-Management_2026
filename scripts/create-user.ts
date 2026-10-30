@@ -1,5 +1,5 @@
-import { loadEnvConfig } from '@next/env';
-loadEnvConfig(process.cwd());
+import nextEnv from '@next/env';
+nextEnv.loadEnvConfig(process.cwd());
 const { pool }=await import('../lib/db');
 const { hashPassword }=await import('../lib/password');
 const username=process.env.BOOTSTRAP_USERNAME?.trim().toLowerCase();
