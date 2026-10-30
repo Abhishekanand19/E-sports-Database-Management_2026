@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from './SessionProvider';
 
 export type Field = {
   name: string;
@@ -12,6 +13,7 @@ export type Field = {
   numeric?: boolean; // send as a number (for ids and numbers)
   step?: string;
   value?: string | number; // used by hidden fields
+  defaultValue?: string | number;
 };
 
 /** A reusable form: posts its fields as JSON to `endpoint`, then refreshes the page. */
@@ -19,15 +21,21 @@ export default function EntityForm({
   title,
   endpoint,
   fields,
+  method = 'POST',
+  reset = true,
 }: {
   title: string;
   endpoint: string;
   fields: Field[];
+  method?: 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  reset?: boolean;
 }) {
   const router = useRouter();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [busy, setBusy] = useState(false);
+  const user=useUser();
+  if(user?.role!=='admin') return null;
 
     async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -46,8 +54,9 @@ export default function EntityForm({
       else body[f.name] = f.type === "number" || f.numeric ? Number(text) : text;
     }
 
+    try {
     const res = await fetch(endpoint, {
-      method: "POST",
+      method,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
@@ -59,8 +68,10 @@ export default function EntityForm({
       return;
     }
     setSuccess("Saved!");
-    formEl.reset(); // use the saved reference
+    if(reset) formEl.reset();
     router.refresh();
+    } catch { setError('Unable to connect. Please retry.'); }
+    finally {setBusy(false);}
   }
 
   return (
@@ -73,7 +84,7 @@ export default function EntityForm({
           <label key={f.name}>
             {f.label}
             {f.type === "select" ? (
-              <select name={f.name} required={f.required ?? true}>
+              <select name={f.name} required={f.required ?? true} defaultValue={f.defaultValue ?? ''}>
                 <option value="">-- choose --</option>
                 {f.options?.map((o) => (
                   <option key={o.value} value={o.value}>
@@ -86,6 +97,8 @@ export default function EntityForm({
                 name={f.name}
                 type={f.type ?? "text"}
                 step={f.step}
+                defaultValue={f.defaultValue}
+                min={f.type==='number'?0:undefined}
                 required={f.required ?? true}
               />
             )}
@@ -95,8 +108,8 @@ export default function EntityForm({
       <button type="submit" disabled={busy}>
         {busy ? "Saving..." : "Save"}
       </button>
-      {error && <p className="error">{error}</p>}
-      {success && <p className="success">{success}</p>}
+      {error && <p className="error" role="alert">{error}</p>}
+      {success && <p className="success" role="status">{success}</p>}
     </form>
   );
 }
