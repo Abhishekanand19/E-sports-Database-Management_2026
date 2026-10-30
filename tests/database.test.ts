@@ -34,6 +34,8 @@ test('excess final position rejected at constraint check',()=>rollback(async c=>
 test('tournament shrink cannot invalidate matches',()=>rejects("UPDATE TOURNAMENT SET start_date='2026-08-10' WHERE tournament_id=1"));
 test('registered opponents cannot be removed',()=>rejects('DELETE FROM PARTICIPATES_IN WHERE tournament_id=1 AND team_id=1'));
 test('historic roster cannot be removed',()=>rejects('DELETE FROM TEAM_MEMBER WHERE player_id=1'));
+test('direct opponent update cannot bypass registration checks',()=>rejects('UPDATE MATCH_TEAM SET team_id=4 WHERE match_id=1 AND team_id=2'));
+test('direct registration identity update cannot orphan opponents',()=>rejects('UPDATE PARTICIPATES_IN SET team_id=4 WHERE tournament_id=1 AND team_id=2'));
 test('standings view computes two wins and six points',async()=>{const r=(await pool.query('SELECT * FROM tournament_standings WHERE tournament_id=1 AND team_id=1')).rows[0];assert.equal(r.wins,2);assert.equal(r.points,6);});
 test('stored function filters by tournament and computes KD',async()=>{const r=(await pool.query('SELECT * FROM player_performance(1) WHERE player_id=1')).rows[0];assert.equal(r.kills,40);assert.equal(r.kd,2.11);assert.equal((await pool.query('SELECT * FROM player_performance(2) WHERE player_id=1')).rowCount,0);});
 test('result correction updates view and audit inside transaction',()=>rollback(async c=>{await c.query("UPDATE RESULT SET winning_team_id=2,losing_team_id=1,score='13-10' WHERE match_id=1");assert.equal((await c.query('SELECT wins FROM tournament_standings WHERE tournament_id=1 AND team_id=1')).rows[0].wins,1);assert.ok((await c.query("SELECT 1 FROM audit_log WHERE operation='UPDATE'")).rowCount);}));

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from './SessionProvider';
 
@@ -34,6 +34,7 @@ export default function EntityForm({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [busy, setBusy] = useState(false);
+  const [refreshing,startTransition]=useTransition();
   const user=useUser();
   if(user?.role!=='admin') return null;
 
@@ -69,7 +70,7 @@ export default function EntityForm({
     }
     setSuccess("Saved!");
     if(reset) formEl.reset();
-    router.refresh();
+    startTransition(()=>router.refresh());
     } catch { setError('Unable to connect. Please retry.'); }
     finally {setBusy(false);}
   }
@@ -84,7 +85,7 @@ export default function EntityForm({
           <label key={f.name}>
             {f.label}
             {f.type === "select" ? (
-              <select name={f.name} required={f.required ?? true} defaultValue={f.defaultValue ?? ''}>
+              <select aria-label={f.label} name={f.name} required={f.required ?? true} defaultValue={f.defaultValue ?? ''}>
                 <option value="">-- choose --</option>
                 {f.options?.map((o) => (
                   <option key={o.value} value={o.value}>
@@ -94,6 +95,7 @@ export default function EntityForm({
               </select>
             ) : (
               <input
+                aria-label={f.label}
                 name={f.name}
                 type={f.type ?? "text"}
                 step={f.step}
@@ -105,8 +107,8 @@ export default function EntityForm({
           </label>
         )
       )}
-      <button type="submit" disabled={busy}>
-        {busy ? "Saving..." : "Save"}
+      <button type="submit" disabled={busy||refreshing}>
+        {busy||refreshing ? "Saving..." : "Save"}
       </button>
       {error && <p className="error" role="alert">{error}</p>}
       {success && <p className="success" role="status">{success}</p>}

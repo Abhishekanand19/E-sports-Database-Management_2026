@@ -7,6 +7,6 @@ const config:NextConfig={
   {key:'X-Frame-Options',value:'DENY'},
   {key:'Referrer-Policy',value:'same-origin'},
   {key:'Permissions-Policy',value:'camera=(), microphone=(), geolocation=()'}
- ]}];}
+ ]},{source:'/api/:path*',headers:[{key:'Cache-Control',value:'private, no-store'}]}];}
 };
 export default config;
