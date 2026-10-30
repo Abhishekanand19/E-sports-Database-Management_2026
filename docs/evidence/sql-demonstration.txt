@@ -1,0 +1,70 @@
+BEGIN
+CREATE TABLE
+ALTER TABLE
+INSERT 0 1
+UPDATE 1
+ id |     description      
+----+----------------------
+  1 | Updated successfully
+(1 row)
+
+DELETE 1
+DROP TABLE
+   team_name    | roster_size 
+----------------+-------------
+ Phoenix Rising |           3
+ Iron Wolves    |           1
+ Neon Tigers    |           1
+ Night Owls     |           1
+(4 rows)
+
+ username  | total_kills 
+-----------+-------------
+ ShadowAce |          40
+ Tigra     |          37
+ Kaze      |          27
+(3 rows)
+
+ tournament_id | team_id |   team_name    | final_position | played | wins | losses | points 
+---------------+---------+----------------+----------------+--------+------+--------+--------
+             1 |       1 | Phoenix Rising |              1 |      2 |    2 |      0 |      6
+             1 |       3 | Iron Wolves    |              2 |      1 |    0 |      1 |      0
+             1 |       2 | Night Owls     |              3 |      1 |    0 |      1 |      0
+(3 rows)
+
+ player_id | username  | matches | kills | deaths | assists |  kd  | avg_rating 
+-----------+-----------+---------+-------+--------+---------+------+------------
+         1 | ShadowAce |       2 |    40 |     19 |       9 | 2.11 |       1.32
+         5 | Tigra     |       1 |    20 |     11 |       4 | 1.82 |        1.1
+         3 | Kaze      |       2 |    27 |     22 |      13 | 1.23 |       0.99
+         6 | Riptide   |       1 |     8 |     13 |       3 | 0.62 |       0.88
+         4 | IronMike  |       2 |    10 |     20 |      17 |  0.5 |       0.75
+(5 rows)
+
+ temporary_match 
+-----------------
+               4
+(1 row)
+
+ entity | operation |            changed_at            
+--------+-----------+----------------------------------
+ result | INSERT    | 2026-10-30 17:33:57.681158+05:30
+ result | INSERT    | 2026-10-30 17:33:57.681158+05:30
+ result | INSERT    | 2026-10-30 17:33:57.681158+05:30
+(3 rows)
+
+                                                         QUERY PLAN                                                         
+----------------------------------------------------------------------------------------------------------------------------
+ Bitmap Heap Scan on player_match_stats  (cost=4.20..13.67 rows=6 width=36) (actual time=0.016..0.016 rows=2.00 loops=1)
+   Recheck Cond: (player_id = 1)
+   Heap Blocks: exact=1
+   Buffers: shared hit=2
+   ->  Bitmap Index Scan on stats_player_idx  (cost=0.00..4.20 rows=6 width=0) (actual time=0.007..0.007 rows=2.00 loops=1)
+         Index Cond: (player_id = 1)
+         Index Searches: 1
+         Buffers: shared hit=1
+ Planning Time: 0.047 ms
+ Execution Time: 0.026 ms
+(10 rows)
+
+ROLLBACK

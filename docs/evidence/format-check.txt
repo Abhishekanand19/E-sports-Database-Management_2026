@@ -1,0 +1,6 @@
+
+> esports-management@1.0.0 format:check
+> prettier --check app components lib scripts tests next.config.ts playwright.config.ts package.json tsconfig.json compose.yaml .github/workflows docs/*.md
+
+Checking formatting...
+All matched files use Prettier code style!

@@ -1,0 +1,38 @@
+{
+  "application_commit": "bcf8b59c219ac062f833db040d704d137b2bdfcb",
+  "verification_date": "2026-10-30",
+  "timezone": "Asia/Kolkata",
+  "ci_verification_commit": "78f24f121c1ad56eb2d670c5dbcef7ce0d1f5148",
+  "ci_run": "https://github.com/Abhishekanand19/E-sports-Database-Management_2026/actions/runs/41052511535",
+  "checks": {
+    "database": 38,
+    "api_including_nested_checks": 74,
+    "redis": 7,
+    "browser": 3,
+    "failed": 0
+  },
+  "sha256": {
+    "docs/evidence/api-tests.txt": "d272b70273c41e0b84fc1c3f87e3e3ec8c20e53266e74e8c3cdc297ad4e863b1",
+    "docs/evidence/browser-tests.txt": "7ba1a39280767f6feb11dcb4c3794a299053ea20f8e624d3689889eac183392d",
+    "docs/evidence/database-tests.txt": "2e872f1d5a89fa9546d5b7ab57a4f55ba3c05a379229e4eaa6061a0b32dd6dcf",
+    "docs/evidence/dependency-audit.json": "0bf0132afb9ec5de40643145552dc39f7d9772a4a43b0169302ff3351684c107",
+    "docs/evidence/format-check.txt": "1576ba0edebbb854cd5a56b11f7b7b5477782ccb63e755f5fd745af4855f643e",
+    "docs/evidence/fresh-setup.txt": "5bac68368413a6a5afcbdcbbff4fc9a3c881276073f28bc5885846cc68f1f1cc",
+    "docs/evidence/github-ci.json": "46781615bafbd00bd4e60affd1c4adde5e297e0c8dcfe9b4877bae71f5d7e494",
+    "docs/evidence/production-build.txt": "9c73dd6375d8e129883165ccdb0da98abf5cbcfa5645ce5c788be62efa178fb7",
+    "docs/evidence/redis-tests.txt": "39f164cb4ba8e548fad87893147d10fb95a8d9e04ef57b92cfe451d5350cee5d",
+    "docs/evidence/sql-demonstration.txt": "5346ba9ad038027e980d785fc126d46ae9e0d6b72a3446db6bf5041f351f0d85",
+    "docs/evidence/typecheck.txt": "f6e8104a1f0f78d696da01c003507d90bdbcf4ea758f6483feae067364efdee3",
+    "docs/screenshots/01-sign-in.png": "795bc83a0a0f8f3a7a169c31dc7fcc58b87eb13215a0b121cd071f9695f099af",
+    "docs/screenshots/02-dashboard.png": "d5bccde3b433a89dd94b2e2c21dd750fe75c88ae0328365d474b4445a61b7e8f",
+    "docs/screenshots/03-players.png": "e796c87275508b4de1a30978da2af6ada8ab8078e45b81d138e2c4a0dc20b682",
+    "docs/screenshots/04-team-roster.png": "5d72e1aa8c91116431204abba529b0e8154f013b5798e42821f659ceef215b05",
+    "docs/screenshots/05-match-result.png": "cbdf9176866af31bb7695c8808b8115604a1c514e84db4f1b56e1ebedd52e635",
+    "docs/screenshots/06-player-statistics.png": "995e32f3d2439a200dfd402e89d8ee7422af58c172971d3cf86c94e774d50a14",
+    "docs/screenshots/07-calculated-standings.png": "fbac034d1f0721f1df7825afda173a19eff71cff269e0986d38a3b29f0b98b09",
+    "docs/screenshots/08-redis-leaderboard.png": "5870ccd364f49f9a379d664ee72e0ed8fbab5ba91744f34efb8509cc43bb81bb",
+    "docs/screenshots/09-invalid-result-rejected.png": "d7b29d0f8b3393b6061fe433c404e9aa33317062e04c52e45b874a64db99893b",
+    "docs/screenshots/10-viewer-access.png": "441e93ab20287d5d6351c5f546f2f133d941eb510e8cf75e2eac80a77e549450",
+    "docs/screenshots/11-mobile-dashboard.png": "f9e3916b7ce7f7b3f5a8e09f47e8c138d54469ffd3df4d02ed734509f148fb8a"
+  }
+}

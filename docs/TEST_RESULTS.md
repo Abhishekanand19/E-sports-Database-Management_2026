@@ -14,6 +14,7 @@ Windows, Node.js 22.19.0, Next.js 15.5.28, React 19.3.1, PostgreSQL 18 and Redis
 | `npm run db:seed` repeated                   | No duplicate tables/data; previously applied filenames skipped                                   |
 | `psql ... -v ON_ERROR_STOP=1 -f db/demo.sql` | DDL/DML/JOIN/HAVING/aggregates/view/function/index-plan executed; transaction rolled back        |
 | `npm run typecheck`                          | Passed, no TypeScript diagnostics                                                                |
+| `npm run format:check`                       | Passed, all matched files use the configured formatter                                           |
 | `npm run build`                              | Production build passed; Next.js routes compiled                                                 |
 | `npm run test:db`                            | **38 passed, 0 failed**                                                                          |
 | `npm run test:api`                           | **74 passed, 0 failed** across 30 top-level cases including nested endpoint authorization checks |
@@ -40,7 +41,7 @@ The final evidence commit adds raw successful command output under `docs/evidenc
 
 ## Remote verification
 
-GitHub Actions provisions PostgreSQL 18 and Redis 7 containers, performs two setup runs, type/format checks, all 122 automated checks, dependency audit and production build, and uploads browser evidence. A final CI run is in progress; its actual result and URL will be recorded in the final evidence commit. Previous intermediate runs are retained in GitHub history and are not represented as passing.
+GitHub Actions completed successfully for verification commit `78f24f121c1ad56eb2d670c5dbcef7ce0d1f5148`: [successful run 41052511535](https://github.com/Abhishekanand19/E-sports-Database-Management_2026/actions/runs/41052511535). It provisioned PostgreSQL 18 and Redis 7 containers, performed two setup runs, type/format checks, all 122 automated checks, dependency audit and production build, and uploaded browser evidence. The run completed at 17:35 IST on 2026-10-30. Raw status/step metadata is retained in `docs/evidence/github-ci.json`. The final evidence-only commit does not change application or test code, and documentation-only pushes are excluded by the workflow's path filter. Previous intermediate failures remain visible in GitHub history and are not represented as passing.
 
 ## Limits and manual requirements
 

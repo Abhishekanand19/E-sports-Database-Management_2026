@@ -1,0 +1,56 @@
+
+> esports-management@1.0.0 test:cache
+> tsx --test tests/cache.test.ts
+
+TAP version 13
+# Subtest: real Redis responds to PING
+ok 1 - real Redis responds to PING
+  ---
+  duration_ms: 20.6455
+  type: 'test'
+  ...
+# Subtest: cache aside miss then hit avoids duplicate fetch
+ok 2 - cache aside miss then hit avoids duplicate fetch
+  ---
+  duration_ms: 100.875
+  type: 'test'
+  ...
+# Subtest: TTL expires and refreshes authoritative data
+ok 3 - TTL expires and refreshes authoritative data
+  ---
+  duration_ms: 1123.8819
+  type: 'test'
+  ...
+# Subtest: committed SQL write advances generation atomically
+ok 4 - committed SQL write advances generation atomically
+  ---
+  duration_ms: 25.3994
+  type: 'test'
+  ...
+# Subtest: corrupt JSON recovers from SQL fetch
+ok 5 - corrupt JSON recovers from SQL fetch
+  ---
+  duration_ms: 7.6579
+  type: 'test'
+  ...
+# Subtest: advanced NoSQL sorted set ranks match SQL and have TTL
+ok 6 - advanced NoSQL sorted set ranks match SQL and have TTL
+  ---
+  duration_ms: 21.3173
+  type: 'test'
+  ...
+# Subtest: unavailable Redis falls back to PostgreSQL within bounded time
+ok 7 - unavailable Redis falls back to PostgreSQL within bounded time
+  ---
+  duration_ms: 1173.0021
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3575.8684

@@ -1,0 +1,67 @@
+
+> esports-management@1.0.0 build
+> next build
+
+   ▲ Next.js 15.5.28
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|C:\Users\anand\Documents\Codex\2026-10-30\on\work\project\node_modules\next\dist\build\webpack\loaders\css-loader\src\index.js??ruleSet[1].rules[14].oneOf[10].use[2]!C:\Users\anand\Documents\Codex\2026-10-30\on\work\project\node_modules\next\dist\build\webpack\loaders\postcss-loader\src\index.js??ruleSet[1].rules[14].oneOf[10].use[3]!C:\Users\anand\Documents\Codex\2026-10-30\on\work\project\app\globals.css': No serializer registered for Warning
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> Array { 1 items } -> webpack/lib/ModuleWarning -> Warning
+ ⚠ Compiled with warnings in 2.1s
+
+./app/globals.css.webpack[javascript/auto]!=!./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[3]!./app/globals.css
+Warning
+
+(193:3) autoprefixer: start value has mixed support, consider using flex-start instead
+
+Import trace for requested module:
+./app/globals.css.webpack[javascript/auto]!=!./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[3]!./app/globals.css
+./app/globals.css
+
+ ✓ Compiled successfully in 5.8s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/16) ...
+   Generating static pages (4/16) 
+   Generating static pages (8/16) 
+   Generating static pages (12/16) 
+ ✓ Generating static pages (16/16)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ƒ /                                      168 B         103 kB
+├ ƒ /_not-found                            168 B         103 kB
+├ ƒ /api/analytics                         168 B         103 kB
+├ ƒ /api/auth/login                        168 B         103 kB
+├ ƒ /api/auth/logout                       168 B         103 kB
+├ ƒ /api/auth/session                      168 B         103 kB
+├ ƒ /api/matches                           168 B         103 kB
+├ ƒ /api/matches/[id]                      168 B         103 kB
+├ ƒ /api/participations                    168 B         103 kB
+├ ƒ /api/players                           168 B         103 kB
+├ ƒ /api/players/[id]                      168 B         103 kB
+├ ƒ /api/results                           168 B         103 kB
+├ ƒ /api/stats                             168 B         103 kB
+├ ƒ /api/team-members                      168 B         103 kB
+├ ƒ /api/teams                             168 B         103 kB
+├ ƒ /api/teams/[id]                        168 B         103 kB
+├ ƒ /api/tournaments                       168 B         103 kB
+├ ƒ /api/tournaments/[id]                  168 B         103 kB
+├ ƒ /leaderboard                           168 B         103 kB
+├ ƒ /login                                 908 B         104 kB
+├ ƒ /matches                             1.48 kB         104 kB
+├ ƒ /players                             1.74 kB         105 kB
+├ ƒ /stats                               1.12 kB         104 kB
+├ ƒ /teams                               1.74 kB         105 kB
+├ ƒ /tournaments                         1.75 kB         108 kB
+└ ƒ /tournaments/[id]                    1.35 kB         108 kB
++ First Load JS shared by all             103 kB
+  ├ chunks/255-b1e2483a7e02feee.js       46.6 kB
+  ├ chunks/4bd1b696-c023c6e3521b1417.js  54.2 kB
+  └ other shared chunks (total)          1.99 kB
+
+
+ƒ  (Dynamic)  server-rendered on demand
+

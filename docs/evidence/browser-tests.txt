@@ -1,0 +1,14 @@
+
+> esports-management@1.0.0 test:e2e
+> playwright test
+
+
+Running 3 tests using 1 worker
+
+(node:29208) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 tests\browser\workflow.spec.ts:61:1 › admin completes player roster tournament match result and stats workflow in browser (10.7s)
+  ok 2 tests\browser\workflow.spec.ts:227:1 › viewer can navigate all major pages and cannot mutate through API (2.1s)
+  ok 3 tests\browser\workflow.spec.ts:255:1 › mobile dashboard navigation stays within viewport (1.2s)
+
+  3 passed (16.0s)

@@ -1,0 +1,460 @@
+
+> esports-management@1.0.0 test:api
+> tsx --test tests/api.test.ts
+
+TAP version 13
+# Subtest: unauthenticated requests cannot read or mutate records
+    # Subtest: POST /api/players
+    ok 1 - POST /api/players
+      ---
+      duration_ms: 8.3854
+      type: 'test'
+      ...
+    # Subtest: POST /api/teams
+    ok 2 - POST /api/teams
+      ---
+      duration_ms: 6.4909
+      type: 'test'
+      ...
+    # Subtest: POST /api/tournaments
+    ok 3 - POST /api/tournaments
+      ---
+      duration_ms: 6.8086
+      type: 'test'
+      ...
+    # Subtest: POST /api/matches
+    ok 4 - POST /api/matches
+      ---
+      duration_ms: 5.7849
+      type: 'test'
+      ...
+    # Subtest: POST /api/results
+    ok 5 - POST /api/results
+      ---
+      duration_ms: 6.2412
+      type: 'test'
+      ...
+    # Subtest: POST /api/stats
+    ok 6 - POST /api/stats
+      ---
+      duration_ms: 6.1665
+      type: 'test'
+      ...
+    # Subtest: POST /api/participations
+    ok 7 - POST /api/participations
+      ---
+      duration_ms: 7.8112
+      type: 'test'
+      ...
+    # Subtest: POST /api/team-members
+    ok 8 - POST /api/team-members
+      ---
+      duration_ms: 6.0133
+      type: 'test'
+      ...
+    # Subtest: PUT /api/players/1
+    ok 9 - PUT /api/players/1
+      ---
+      duration_ms: 7.2429
+      type: 'test'
+      ...
+    # Subtest: PUT /api/teams/1
+    ok 10 - PUT /api/teams/1
+      ---
+      duration_ms: 6.0924
+      type: 'test'
+      ...
+    # Subtest: PUT /api/tournaments/1
+    ok 11 - PUT /api/tournaments/1
+      ---
+      duration_ms: 6.111
+      type: 'test'
+      ...
+    # Subtest: DELETE /api/players/999999
+    ok 12 - DELETE /api/players/999999
+      ---
+      duration_ms: 4.3218
+      type: 'test'
+      ...
+    # Subtest: DELETE /api/teams/999999
+    ok 13 - DELETE /api/teams/999999
+      ---
+      duration_ms: 9.1924
+      type: 'test'
+      ...
+    # Subtest: DELETE /api/tournaments/999999
+    ok 14 - DELETE /api/tournaments/999999
+      ---
+      duration_ms: 7.672
+      type: 'test'
+      ...
+    # Subtest: DELETE /api/matches/999999
+    ok 15 - DELETE /api/matches/999999
+      ---
+      duration_ms: 9.4221
+      type: 'test'
+      ...
+    # Subtest: DELETE /api/results
+    ok 16 - DELETE /api/results
+      ---
+      duration_ms: 7.4534
+      type: 'test'
+      ...
+    # Subtest: DELETE /api/stats
+    ok 17 - DELETE /api/stats
+      ---
+      duration_ms: 24.8629
+      type: 'test'
+      ...
+    # Subtest: DELETE /api/participations
+    ok 18 - DELETE /api/participations
+      ---
+      duration_ms: 10.2585
+      type: 'test'
+      ...
+    # Subtest: DELETE /api/team-members
+    ok 19 - DELETE /api/team-members
+      ---
+      duration_ms: 9.3982
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/participations
+    ok 20 - PATCH /api/participations
+      ---
+      duration_ms: 8.676
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/team-members
+    ok 21 - PATCH /api/team-members
+      ---
+      duration_ms: 24.7563
+      type: 'test'
+      ...
+    # Subtest: GET /api/players
+    ok 22 - GET /api/players
+      ---
+      duration_ms: 4.0147
+      type: 'test'
+      ...
+    # Subtest: GET /api/analytics
+    ok 23 - GET /api/analytics
+      ---
+      duration_ms: 6.0279
+      type: 'test'
+      ...
+    1..23
+ok 1 - unauthenticated requests cannot read or mutate records
+  ---
+  duration_ms: 742.8412
+  type: 'test'
+  ...
+# Subtest: viewer cannot bypass UI to invoke any mutation
+    # Subtest: POST /api/players
+    ok 1 - POST /api/players
+      ---
+      duration_ms: 6.1298
+      type: 'test'
+      ...
+    # Subtest: POST /api/teams
+    ok 2 - POST /api/teams
+      ---
+      duration_ms: 6.7164
+      type: 'test'
+      ...
+    # Subtest: POST /api/tournaments
+    ok 3 - POST /api/tournaments
+      ---
+      duration_ms: 5.1978
+      type: 'test'
+      ...
+    # Subtest: POST /api/matches
+    ok 4 - POST /api/matches
+      ---
+      duration_ms: 6.6048
+      type: 'test'
+      ...
+    # Subtest: POST /api/results
+    ok 5 - POST /api/results
+      ---
+      duration_ms: 6.9446
+      type: 'test'
+      ...
+    # Subtest: POST /api/stats
+    ok 6 - POST /api/stats
+      ---
+      duration_ms: 8.5708
+      type: 'test'
+      ...
+    # Subtest: POST /api/participations
+    ok 7 - POST /api/participations
+      ---
+      duration_ms: 9.5875
+      type: 'test'
+      ...
+    # Subtest: POST /api/team-members
+    ok 8 - POST /api/team-members
+      ---
+      duration_ms: 8.4162
+      type: 'test'
+      ...
+    # Subtest: PUT /api/players/1
+    ok 9 - PUT /api/players/1
+      ---
+      duration_ms: 7.4903
+      type: 'test'
+      ...
+    # Subtest: PUT /api/teams/1
+    ok 10 - PUT /api/teams/1
+      ---
+      duration_ms: 8.0911
+      type: 'test'
+      ...
+    # Subtest: PUT /api/tournaments/1
+    ok 11 - PUT /api/tournaments/1
+      ---
+      duration_ms: 9.3435
+      type: 'test'
+      ...
+    # Subtest: DELETE /api/players/999999
+    ok 12 - DELETE /api/players/999999
+      ---
+      duration_ms: 7.6491
+      type: 'test'
+      ...
+    # Subtest: DELETE /api/teams/999999
+    ok 13 - DELETE /api/teams/999999
+      ---
+      duration_ms: 6.0545
+      type: 'test'
+      ...
+    # Subtest: DELETE /api/tournaments/999999
+    ok 14 - DELETE /api/tournaments/999999
+      ---
+      duration_ms: 11.3744
+      type: 'test'
+      ...
+    # Subtest: DELETE /api/matches/999999
+    ok 15 - DELETE /api/matches/999999
+      ---
+      duration_ms: 9.7634
+      type: 'test'
+      ...
+    # Subtest: DELETE /api/results
+    ok 16 - DELETE /api/results
+      ---
+      duration_ms: 8.7197
+      type: 'test'
+      ...
+    # Subtest: DELETE /api/stats
+    ok 17 - DELETE /api/stats
+      ---
+      duration_ms: 8.1528
+      type: 'test'
+      ...
+    # Subtest: DELETE /api/participations
+    ok 18 - DELETE /api/participations
+      ---
+      duration_ms: 8.9778
+      type: 'test'
+      ...
+    # Subtest: DELETE /api/team-members
+    ok 19 - DELETE /api/team-members
+      ---
+      duration_ms: 9.6894
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/participations
+    ok 20 - PATCH /api/participations
+      ---
+      duration_ms: 9.9069
+      type: 'test'
+      ...
+    # Subtest: PATCH /api/team-members
+    ok 21 - PATCH /api/team-members
+      ---
+      duration_ms: 10.4064
+      type: 'test'
+      ...
+    1..21
+ok 2 - viewer cannot bypass UI to invoke any mutation
+  ---
+  duration_ms: 178.375
+  type: 'test'
+  ...
+# Subtest: viewer can read collection and analytics endpoints
+ok 3 - viewer can read collection and analytics endpoints
+  ---
+  duration_ms: 43.495
+  type: 'test'
+  ...
+# Subtest: session endpoint identifies role and session storage contains only digest
+ok 4 - session endpoint identifies role and session storage contains only digest
+  ---
+  duration_ms: 13.1987
+  type: 'test'
+  ...
+# Subtest: invalid credentials rejected
+ok 5 - invalid credentials rejected
+  ---
+  duration_ms: 68.4924
+  type: 'test'
+  ...
+# Subtest: cross-origin mutations rejected
+ok 6 - cross-origin mutations rejected
+  ---
+  duration_ms: 5.3566
+  type: 'test'
+  ...
+# Subtest: malformed JSON rejected
+ok 7 - malformed JSON rejected
+  ---
+  duration_ms: 8.6945
+  type: 'test'
+  ...
+# Subtest: incorrect content type rejected
+ok 8 - incorrect content type rejected
+  ---
+  duration_ms: 4.7105
+  type: 'test'
+  ...
+# Subtest: invalid scalar and missing fields rejected on all create endpoints
+ok 9 - invalid scalar and missing fields rejected on all create endpoints
+  ---
+  duration_ms: 65.393
+  type: 'test'
+  ...
+# Subtest: invalid IDs and missing records return 400 and 404
+ok 10 - invalid IDs and missing records return 400 and 404
+  ---
+  duration_ms: 35.1143
+  type: 'test'
+  ...
+# Subtest: admin creates a player with real SQL record
+ok 11 - admin creates a player with real SQL record
+  ---
+  duration_ms: 10.2656
+  type: 'test'
+  ...
+# Subtest: admin edits player and duplicate username returns 409
+ok 12 - admin edits player and duplicate username returns 409
+  ---
+  duration_ms: 15.4057
+  type: 'test'
+  ...
+# Subtest: admin creates and updates two teams
+ok 13 - admin creates and updates two teams
+  ---
+  duration_ms: 22.5751
+  type: 'test'
+  ...
+# Subtest: admin assigns a roster member and rejects overlap
+ok 14 - admin assigns a roster member and rejects overlap
+  ---
+  duration_ms: 16.8821
+  type: 'test'
+  ...
+# Subtest: admin creates and updates tournament
+ok 15 - admin creates and updates tournament
+  ---
+  duration_ms: 19.6172
+  type: 'test'
+  ...
+# Subtest: admin registers both teams and duplicate registration returns 409
+ok 16 - admin registers both teams and duplicate registration returns 409
+  ---
+  duration_ms: 26.2812
+  type: 'test'
+  ...
+# Subtest: admin updates placement while invalid placement is rejected
+ok 17 - admin updates placement while invalid placement is rejected
+  ---
+  duration_ms: 15.4174
+  type: 'test'
+  ...
+# Subtest: invalid schedule rolls back match insert
+ok 18 - invalid schedule rolls back match insert
+  ---
+  duration_ms: 16.2649
+  type: 'test'
+  ...
+# Subtest: admin schedules opponents atomically
+ok 19 - admin schedules opponents atomically
+  ---
+  duration_ms: 12.5092
+  type: 'test'
+  ...
+# Subtest: withdrawing a scheduled opponent is rejected
+ok 20 - withdrawing a scheduled opponent is rejected
+  ---
+  duration_ms: 8.3975
+  type: 'test'
+  ...
+# Subtest: invalid winner rejected and valid result updates standings
+ok 21 - invalid winner rejected and valid result updates standings
+  ---
+  duration_ms: 196.0469
+  type: 'test'
+  ...
+# Subtest: admin corrects result and audit records correction
+ok 22 - admin corrects result and audit records correction
+  ---
+  duration_ms: 12.3102
+  type: 'test'
+  ...
+# Subtest: invalid stats roll back participation and valid stats are recorded
+ok 23 - invalid stats roll back participation and valid stats are recorded
+  ---
+  duration_ms: 28.0643
+  type: 'test'
+  ...
+# Subtest: negative statistics rejected with no mutation
+ok 24 - negative statistics rejected with no mutation
+  ---
+  duration_ms: 9.3605
+  type: 'test'
+  ...
+# Subtest: tournament performance and Redis sorted set leaderboard stay consistent
+ok 25 - tournament performance and Redis sorted set leaderboard stay consistent
+  ---
+  duration_ms: 33.1966
+  type: 'test'
+  ...
+# Subtest: cache hit changes to SQL miss after committed write
+ok 26 - cache hit changes to SQL miss after committed write
+  ---
+  duration_ms: 38.2557
+  type: 'test'
+  ...
+# Subtest: admin releases roster member preserving history
+ok 27 - admin releases roster member preserving history
+  ---
+  duration_ms: 10.6693
+  type: 'test'
+  ...
+# Subtest: authenticated detail reads return updated records
+ok 28 - authenticated detail reads return updated records
+  ---
+  duration_ms: 15.5657
+  type: 'test'
+  ...
+# Subtest: CRUD delete sequence removes stats results matches registrations and entities
+ok 29 - CRUD delete sequence removes stats results matches registrations and entities
+  ---
+  duration_ms: 94.3069
+  type: 'test'
+  ...
+# Subtest: logout revokes session and prevents replay
+ok 30 - logout revokes session and prevents replay
+  ---
+  duration_ms: 15.8646
+  type: 'test'
+  ...
+1..30
+# tests 74
+# suites 0
+# pass 74
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2363.6308

@@ -1,0 +1,17 @@
+
+> esports-management@1.0.0 db:seed
+> tsx scripts/db.ts --seed
+
+Applied schema.sql
+Applied migrations/001_scheduling.sql
+Applied migrations/002_integrity.sql
+Applied migrations/003_analytics.sql
+Applied migrations/004_auth.sql
+Applied migrations/005_cache_revision.sql
+Applied migrations/006_consistency.sql
+Applied migrations/007_protect_relationship_updates.sql
+Applied seed.sql
+
+> esports-management@1.0.0 db:seed
+> tsx scripts/db.ts --seed
+

@@ -1,0 +1,242 @@
+
+> esports-management@1.0.0 test:db
+> tsx --test tests/database.test.ts
+
+TAP version 13
+# Subtest: seed has six players, four teams and three complete matches
+ok 1 - seed has six players, four teams and three complete matches
+  ---
+  duration_ms: 111.1705
+  type: 'test'
+  ...
+# Subtest: primary key rejects duplicate game
+ok 2 - primary key rejects duplicate game
+  ---
+  duration_ms: 7.4087
+  type: 'test'
+  ...
+# Subtest: foreign key rejects missing game
+ok 3 - foreign key rejects missing game
+  ---
+  duration_ms: 9.6598
+  type: 'test'
+  ...
+# Subtest: negative prize rejected
+ok 4 - negative prize rejected
+  ---
+  duration_ms: 7.6195
+  type: 'test'
+  ...
+# Subtest: tournament inverted dates rejected
+ok 5 - tournament inverted dates rejected
+  ---
+  duration_ms: 5.0187
+  type: 'test'
+  ...
+# Subtest: match outside tournament rejected
+ok 6 - match outside tournament rejected
+  ---
+  duration_ms: 3.1725
+  type: 'test'
+  ...
+# Subtest: unregistered scheduled team rejected
+ok 7 - unregistered scheduled team rejected
+  ---
+  duration_ms: 7.5134
+  type: 'test'
+  ...
+# Subtest: same opponent twice rejected
+ok 8 - same opponent twice rejected
+  ---
+  duration_ms: 4.3296
+  type: 'test'
+  ...
+# Subtest: invalid winner rejected
+ok 9 - invalid winner rejected
+  ---
+  duration_ms: 6.0245
+  type: 'test'
+  ...
+# Subtest: same winner and loser rejected
+ok 10 - same winner and loser rejected
+  ---
+  duration_ms: 2.707
+  type: 'test'
+  ...
+# Subtest: contradictory score rejected
+ok 11 - contradictory score rejected
+  ---
+  duration_ms: 2.4186
+  type: 'test'
+  ...
+# Subtest: negative kills rejected
+ok 12 - negative kills rejected
+  ---
+  duration_ms: 3.5996
+  type: 'test'
+  ...
+# Subtest: negative deaths rejected
+ok 13 - negative deaths rejected
+  ---
+  duration_ms: 3.8601
+  type: 'test'
+  ...
+# Subtest: negative assists rejected
+ok 14 - negative assists rejected
+  ---
+  duration_ms: 2.2744
+  type: 'test'
+  ...
+# Subtest: negative damage rejected
+ok 15 - negative damage rejected
+  ---
+  duration_ms: 1.9152
+  type: 'test'
+  ...
+# Subtest: future birth date rejected
+ok 16 - future birth date rejected
+  ---
+  duration_ms: 1.5619
+  type: 'test'
+  ...
+# Subtest: blank username rejected
+ok 17 - blank username rejected
+  ---
+  duration_ms: 1.718
+  type: 'test'
+  ...
+# Subtest: duplicate roster rejected
+ok 18 - duplicate roster rejected
+  ---
+  duration_ms: 3.8717
+  type: 'test'
+  ...
+# Subtest: wrong team player rejected
+ok 19 - wrong team player rejected
+  ---
+  duration_ms: 2.7232
+  type: 'test'
+  ...
+# Subtest: statistics without participation rejected
+ok 20 - statistics without participation rejected
+  ---
+  duration_ms: 4.0122
+  type: 'test'
+  ...
+# Subtest: invalid final position rejected
+ok 21 - invalid final position rejected
+  ---
+  duration_ms: 3.2038
+  type: 'test'
+  ...
+# Subtest: duplicate position rejected
+ok 22 - duplicate position rejected
+  ---
+  duration_ms: 1.8426
+  type: 'test'
+  ...
+# Subtest: excess final position rejected at constraint check
+ok 23 - excess final position rejected at constraint check
+  ---
+  duration_ms: 4.5587
+  type: 'test'
+  ...
+# Subtest: tournament shrink cannot invalidate matches
+ok 24 - tournament shrink cannot invalidate matches
+  ---
+  duration_ms: 2.3993
+  type: 'test'
+  ...
+# Subtest: registered opponents cannot be removed
+ok 25 - registered opponents cannot be removed
+  ---
+  duration_ms: 3.5315
+  type: 'test'
+  ...
+# Subtest: historic roster cannot be removed
+ok 26 - historic roster cannot be removed
+  ---
+  duration_ms: 2.9965
+  type: 'test'
+  ...
+# Subtest: direct opponent update cannot bypass registration checks
+ok 27 - direct opponent update cannot bypass registration checks
+  ---
+  duration_ms: 2.1459
+  type: 'test'
+  ...
+# Subtest: direct registration identity update cannot orphan opponents
+ok 28 - direct registration identity update cannot orphan opponents
+  ---
+  duration_ms: 1.7348
+  type: 'test'
+  ...
+# Subtest: standings view computes two wins and six points
+ok 29 - standings view computes two wins and six points
+  ---
+  duration_ms: 4.6998
+  type: 'test'
+  ...
+# Subtest: stored function filters by tournament and computes KD
+ok 30 - stored function filters by tournament and computes KD
+  ---
+  duration_ms: 6.2294
+  type: 'test'
+  ...
+# Subtest: result correction updates view and audit inside transaction
+ok 31 - result correction updates view and audit inside transaction
+  ---
+  duration_ms: 10.0814
+  type: 'test'
+  ...
+# Subtest: rollback restores writes and cache revision
+ok 32 - rollback restores writes and cache revision
+  ---
+  duration_ms: 4.6305
+  type: 'test'
+  ...
+# Subtest: transactional scheduling creates exactly two opponents
+ok 33 - transactional scheduling creates exactly two opponents
+  ---
+  duration_ms: 5.0108
+  type: 'test'
+  ...
+# Subtest: incomplete match rejected at transaction boundary
+ok 34 - incomplete match rejected at transaction boundary
+  ---
+  duration_ms: 2.3675
+  type: 'test'
+  ...
+# Subtest: DDL CREATE ALTER DROP and DML INSERT UPDATE DELETE execute safely
+ok 35 - DDL CREATE ALTER DROP and DML INSERT UPDATE DELETE execute safely
+  ---
+  duration_ms: 14.3968
+  type: 'test'
+  ...
+# Subtest: JOIN GROUP BY HAVING aggregates subquery ORDER BY execute
+ok 36 - JOIN GROUP BY HAVING aggregates subquery ORDER BY execute
+  ---
+  duration_ms: 2.0661
+  type: 'test'
+  ...
+# Subtest: query indexes exist
+ok 37 - query indexes exist
+  ---
+  duration_ms: 5.1744
+  type: 'test'
+  ...
+# Subtest: password hashes are salted and verify without plaintext
+ok 38 - password hashes are salted and verify without plaintext
+  ---
+  duration_ms: 302.7602
+  type: 'test'
+  ...
+1..38
+# tests 38
+# suites 0
+# pass 38
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1106.3462
