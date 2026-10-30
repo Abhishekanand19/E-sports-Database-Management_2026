@@ -1,13 +1,24 @@
 import { NextResponse } from "next/server";
 
 /** Returns a 400 response if any required field is missing, otherwise null. */
-export function validate(body: Record<string, unknown> | null, fields: string[]) {
+export function validate(
+  body: Record<string, unknown> | null,
+  fields: string[],
+) {
   if (!body) {
-    return NextResponse.json({ error: "Request body must be JSON" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Request body must be JSON" },
+      { status: 400 },
+    );
   }
-  const missing = fields.filter((f) => body[f] === undefined || body[f] === null || body[f] === "");
+  const missing = fields.filter(
+    (f) => body[f] === undefined || body[f] === null || body[f] === "",
+  );
   if (missing.length > 0) {
-    return NextResponse.json({ error: `Missing required fields: ${missing.join(", ")}` }, { status: 400 });
+    return NextResponse.json(
+      { error: `Missing required fields: ${missing.join(", ")}` },
+      { status: 400 },
+    );
   }
   return null;
 }

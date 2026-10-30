@@ -6,7 +6,10 @@ import { listMatches, getLookups } from "@/lib/queries";
 export const dynamic = "force-dynamic";
 
 export default async function MatchesPage() {
-  const [{ data: matches, source }, { data: lookups }] = await Promise.all([listMatches(), getLookups()]);
+  const [{ data: matches, source }, { data: lookups }] = await Promise.all([
+    listMatches(),
+    getLookups(),
+  ]);
 
   return (
     <>
@@ -15,7 +18,17 @@ export default async function MatchesPage() {
 
       <table>
         <thead>
-          <tr><th>#</th><th>Tournament</th><th>Round</th><th>Date</th><th>Winner</th><th>Loser</th><th>Score</th><th>Opponents</th><th>Actions</th></tr>
+          <tr>
+            <th>#</th>
+            <th>Tournament</th>
+            <th>Round</th>
+            <th>Date</th>
+            <th>Winner</th>
+            <th>Loser</th>
+            <th>Score</th>
+            <th>Opponents</th>
+            <th>Actions</th>
+          </tr>
         </thead>
         <tbody>
           {matches.map((m: any) => (
@@ -26,7 +39,21 @@ export default async function MatchesPage() {
               <td>{m.match_date}</td>
               <td>{m.winner ?? <span className="muted">pending</span>}</td>
               <td>{m.loser ?? "-"}</td>
-              <td>{m.score ?? "-"}</td><td>{m.opponents}</td><td><DeleteButton url={`/api/matches/${m.match_id}`} label="Cancel match"/>{m.score&&<ActionButton endpoint="/api/results" payload={{match_id:m.match_id}} label="Clear result"/>}</td>
+              <td>{m.score ?? "-"}</td>
+              <td>{m.opponents}</td>
+              <td>
+                <DeleteButton
+                  url={`/api/matches/${m.match_id}`}
+                  label="Cancel match"
+                />
+                {m.score && (
+                  <ActionButton
+                    endpoint="/api/results"
+                    payload={{ match_id: m.match_id }}
+                    label="Clear result"
+                  />
+                )}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -37,20 +64,56 @@ export default async function MatchesPage() {
           title="Schedule a match"
           endpoint="/api/matches"
           fields={[
-            { name: "tournament_id", label: "Tournament", type: "select", numeric: true, options: lookups.tournaments },
+            {
+              name: "tournament_id",
+              label: "Tournament",
+              type: "select",
+              numeric: true,
+              options: lookups.tournaments,
+            },
             { name: "match_date", label: "Match date", type: "date" },
             { name: "round", label: "Round (e.g. Quarterfinal)" },
-            {name:"team_a",label:"Opponent A (registered team)",type:"select",numeric:true,options:lookups.teams},
-            {name:"team_b",label:"Opponent B (registered team)",type:"select",numeric:true,options:lookups.teams},
+            {
+              name: "team_a",
+              label: "Opponent A (registered team)",
+              type: "select",
+              numeric: true,
+              options: lookups.teams,
+            },
+            {
+              name: "team_b",
+              label: "Opponent B (registered team)",
+              type: "select",
+              numeric: true,
+              options: lookups.teams,
+            },
           ]}
         />
         <EntityForm
           title="Record match result"
           endpoint="/api/results"
           fields={[
-            { name: "match_id", label: "Match", type: "select", numeric: true, options: lookups.matches },
-            { name: "winning_team_id", label: "Winner", type: "select", numeric: true, options: lookups.teams },
-            { name: "losing_team_id", label: "Loser", type: "select", numeric: true, options: lookups.teams },
+            {
+              name: "match_id",
+              label: "Match",
+              type: "select",
+              numeric: true,
+              options: lookups.matches,
+            },
+            {
+              name: "winning_team_id",
+              label: "Winner",
+              type: "select",
+              numeric: true,
+              options: lookups.teams,
+            },
+            {
+              name: "losing_team_id",
+              label: "Loser",
+              type: "select",
+              numeric: true,
+              options: lookups.teams,
+            },
             { name: "score", label: "Score (e.g. 13-7)" },
           ]}
         />

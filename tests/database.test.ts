@@ -1,48 +1,239 @@
-import nextEnv from '@next/env';
+import nextEnv from "@next/env";
 nextEnv.loadEnvConfig(process.cwd());
-import { test,after } from 'node:test';
-import assert from 'node:assert/strict';
-import { Pool,type PoolClient } from 'pg';
-import { hashPassword,verifyPassword } from '../lib/password';
-const pool=new Pool({connectionString:process.env.TEST_DATABASE_URL??process.env.DATABASE_URL});
-after(async()=>{await pool.end();});
-async function rollback(work:(c:PoolClient)=>Promise<void>){const c=await pool.connect();try{await c.query('BEGIN');await work(c);}finally{await c.query('ROLLBACK');c.release();}}
-async function rejects(sql:string,values:unknown[]=[],code='23514'){await rollback(async c=>{await assert.rejects(c.query(sql,values),(e:unknown)=>(e as {code:string}).code===code);});}
-test('seed has six players, four teams and three complete matches',async()=>{assert.equal((await pool.query('SELECT count(*) FROM PLAYER')).rows[0].count,'6');assert.equal((await pool.query('SELECT count(*) FROM MATCH')).rows[0].count,'3');});
-test('primary key rejects duplicate game',()=>rejects("INSERT INTO GAME(game_id,title) VALUES(1,'Duplicate')",[],'23505'));
-test('foreign key rejects missing game',()=>rejects("INSERT INTO TOURNAMENT(name,game_id,start_date,end_date) VALUES('Invalid',999999,'2026-01-01','2026-01-02')",[],'23503'));
-test('negative prize rejected',()=>rejects('UPDATE TOURNAMENT SET prize_pool=-1 WHERE tournament_id=1'));
-test('tournament inverted dates rejected',()=>rejects("UPDATE TOURNAMENT SET end_date='2020-01-01' WHERE tournament_id=1"));
-test('match outside tournament rejected',()=>rejects("SELECT schedule_match(1,'2026-09-01','Final',1,2)"));
-test('unregistered scheduled team rejected',()=>rejects("SELECT schedule_match(1,'2026-08-15','Final',1,4)"));
-test('same opponent twice rejected',()=>rejects("SELECT schedule_match(1,'2026-08-15','Final',1,1)"));
-test('invalid winner rejected',()=>rejects('UPDATE RESULT SET winning_team_id=4 WHERE match_id=1'));
-test('same winner and loser rejected',()=>rejects('UPDATE RESULT SET winning_team_id=losing_team_id WHERE match_id=1'));
-test('contradictory score rejected',()=>rejects("UPDATE RESULT SET score='7-13' WHERE match_id=1"));
-test('negative kills rejected',()=>rejects('UPDATE PLAYER_MATCH_STATS SET kills=-1 WHERE match_id=1 AND player_id=1'));
-test('negative deaths rejected',()=>rejects('UPDATE PLAYER_MATCH_STATS SET deaths=-1 WHERE match_id=1 AND player_id=1'));
-test('negative assists rejected',()=>rejects('UPDATE PLAYER_MATCH_STATS SET assists=-1 WHERE match_id=1 AND player_id=1'));
-test('negative damage rejected',()=>rejects('UPDATE PLAYER_MATCH_STATS SET damage=-1 WHERE match_id=1 AND player_id=1'));
-test('future birth date rejected',()=>rejects("UPDATE PLAYER SET date_of_birth=current_date+1 WHERE player_id=1"));
-test('blank username rejected',()=>rejects("UPDATE PLAYER SET username='  ' WHERE player_id=1"));
-test('duplicate roster rejected',()=>rejects("INSERT INTO TEAM_MEMBER(player_id,team_id,join_date) VALUES(1,2,'2026-01-01')"));
-test('wrong team player rejected',()=>rejects('INSERT INTO PLAYED_BY VALUES(1,2,2)'));
-test('statistics without participation rejected',()=>rejects('INSERT INTO PLAYER_MATCH_STATS(match_id,player_id) VALUES(1,2)',[],'23503'));
-test('invalid final position rejected',()=>rejects('UPDATE PARTICIPATES_IN SET final_position=0 WHERE tournament_id=1 AND team_id=1'));
-test('duplicate position rejected',()=>rejects('UPDATE PARTICIPATES_IN SET final_position=2 WHERE tournament_id=1 AND team_id=1',[],'23505'));
-test('excess final position rejected at constraint check',()=>rollback(async c=>{await c.query('UPDATE PARTICIPATES_IN SET final_position=99 WHERE tournament_id=1 AND team_id=1');await assert.rejects(c.query('SET CONSTRAINTS ALL IMMEDIATE'));}));
-test('tournament shrink cannot invalidate matches',()=>rejects("UPDATE TOURNAMENT SET start_date='2026-08-10' WHERE tournament_id=1"));
-test('registered opponents cannot be removed',()=>rejects('DELETE FROM PARTICIPATES_IN WHERE tournament_id=1 AND team_id=1'));
-test('historic roster cannot be removed',()=>rejects('DELETE FROM TEAM_MEMBER WHERE player_id=1'));
-test('direct opponent update cannot bypass registration checks',()=>rejects('UPDATE MATCH_TEAM SET team_id=4 WHERE match_id=1 AND team_id=2'));
-test('direct registration identity update cannot orphan opponents',()=>rejects('UPDATE PARTICIPATES_IN SET team_id=4 WHERE tournament_id=1 AND team_id=2'));
-test('standings view computes two wins and six points',async()=>{const r=(await pool.query('SELECT * FROM tournament_standings WHERE tournament_id=1 AND team_id=1')).rows[0];assert.equal(r.wins,2);assert.equal(r.points,6);});
-test('stored function filters by tournament and computes KD',async()=>{const r=(await pool.query('SELECT * FROM player_performance(1) WHERE player_id=1')).rows[0];assert.equal(r.kills,40);assert.equal(r.kd,2.11);assert.equal((await pool.query('SELECT * FROM player_performance(2) WHERE player_id=1')).rowCount,0);});
-test('result correction updates view and audit inside transaction',()=>rollback(async c=>{await c.query("UPDATE RESULT SET winning_team_id=2,losing_team_id=1,score='13-10' WHERE match_id=1");assert.equal((await c.query('SELECT wins FROM tournament_standings WHERE tournament_id=1 AND team_id=1')).rows[0].wins,1);assert.ok((await c.query("SELECT 1 FROM audit_log WHERE operation='UPDATE'")).rowCount);}));
-test('rollback restores writes and cache revision',async()=>{const before=(await pool.query('SELECT version FROM cache_revision')).rows[0].version;await rollback(async c=>{await c.query("UPDATE PLAYER SET country='Changed' WHERE player_id=1");assert.notEqual((await c.query('SELECT version FROM cache_revision')).rows[0].version,before);});assert.equal((await pool.query('SELECT version FROM cache_revision')).rows[0].version,before);});
-test('transactional scheduling creates exactly two opponents',()=>rollback(async c=>{const id=(await c.query("SELECT schedule_match(1,'2026-08-20','Final',1,2) AS id")).rows[0].id;assert.equal((await c.query('SELECT count(*) FROM MATCH_TEAM WHERE match_id=$1',[id])).rows[0].count,'2');await c.query('SET CONSTRAINTS ALL IMMEDIATE');}));
-test('incomplete match rejected at transaction boundary',()=>rollback(async c=>{await c.query("INSERT INTO MATCH(tournament_id,match_date,round) VALUES(1,'2026-08-20','Invalid')");await assert.rejects(c.query('SET CONSTRAINTS ALL IMMEDIATE'));}));
-test('DDL CREATE ALTER DROP and DML INSERT UPDATE DELETE execute safely',()=>rollback(async c=>{await c.query('CREATE TEMP TABLE ddl_demo(id integer PRIMARY KEY)');await c.query('ALTER TABLE ddl_demo ADD COLUMN label text');await c.query("INSERT INTO ddl_demo VALUES(1,'Before')");await c.query("UPDATE ddl_demo SET label='After' WHERE id=1");assert.equal((await c.query('SELECT label FROM ddl_demo')).rows[0].label,'After');await c.query('DELETE FROM ddl_demo');assert.equal((await c.query('SELECT * FROM ddl_demo')).rowCount,0);await c.query('DROP TABLE ddl_demo');}));
-test('JOIN GROUP BY HAVING aggregates subquery ORDER BY execute',async()=>{const r=await pool.query(`SELECT p.username,sum(s.kills)::int AS kills FROM PLAYER p INNER JOIN PLAYER_MATCH_STATS s USING(player_id) LEFT JOIN TEAM_MEMBER tm USING(player_id) WHERE p.player_id IN(SELECT player_id FROM PLAYED_BY) GROUP BY p.player_id HAVING sum(s.kills)>20 ORDER BY kills DESC`);assert.equal(r.rows[0].username,'ShadowAce');});
-test('query indexes exist',async()=>{const r=await pool.query("SELECT indexname FROM pg_indexes WHERE indexname IN('match_tournament_date_idx','stats_player_idx','roster_team_idx','unique_active_roster_idx')");assert.equal(r.rowCount,4);});
-test('password hashes are salted and verify without plaintext',async()=>{const password='Only-a-test-generated-password';const a=await hashPassword(password),b=await hashPassword(password);assert.notEqual(a,b);assert.equal(a.includes(password),false);assert.equal(await verifyPassword(password,a),true);assert.equal(await verifyPassword('wrong',a),false);});
+import { test, after } from "node:test";
+import assert from "node:assert/strict";
+import { Pool, type PoolClient } from "pg";
+import { hashPassword, verifyPassword } from "../lib/password";
+const pool = new Pool({
+  connectionString: process.env.TEST_DATABASE_URL ?? process.env.DATABASE_URL,
+});
+after(async () => {
+  await pool.end();
+});
+async function rollback(work: (c: PoolClient) => Promise<void>) {
+  const c = await pool.connect();
+  try {
+    await c.query("BEGIN");
+    await work(c);
+  } finally {
+    await c.query("ROLLBACK");
+    c.release();
+  }
+}
+async function rejects(sql: string, values: unknown[] = [], code = "23514") {
+  await rollback(async (c) => {
+    await assert.rejects(
+      c.query(sql, values),
+      (e: unknown) => (e as { code: string }).code === code,
+    );
+  });
+}
+test("seed has six players, four teams and three complete matches", async () => {
+  assert.equal(
+    (await pool.query("SELECT count(*) FROM PLAYER")).rows[0].count,
+    "6",
+  );
+  assert.equal(
+    (await pool.query("SELECT count(*) FROM MATCH")).rows[0].count,
+    "3",
+  );
+});
+test("primary key rejects duplicate game", () =>
+  rejects(
+    "INSERT INTO GAME(game_id,title) VALUES(1,'Duplicate')",
+    [],
+    "23505",
+  ));
+test("foreign key rejects missing game", () =>
+  rejects(
+    "INSERT INTO TOURNAMENT(name,game_id,start_date,end_date) VALUES('Invalid',999999,'2026-01-01','2026-01-02')",
+    [],
+    "23503",
+  ));
+test("negative prize rejected", () =>
+  rejects("UPDATE TOURNAMENT SET prize_pool=-1 WHERE tournament_id=1"));
+test("tournament inverted dates rejected", () =>
+  rejects("UPDATE TOURNAMENT SET end_date='2020-01-01' WHERE tournament_id=1"));
+test("match outside tournament rejected", () =>
+  rejects("SELECT schedule_match(1,'2026-09-01','Final',1,2)"));
+test("unregistered scheduled team rejected", () =>
+  rejects("SELECT schedule_match(1,'2026-08-15','Final',1,4)"));
+test("same opponent twice rejected", () =>
+  rejects("SELECT schedule_match(1,'2026-08-15','Final',1,1)"));
+test("invalid winner rejected", () =>
+  rejects("UPDATE RESULT SET winning_team_id=4 WHERE match_id=1"));
+test("same winner and loser rejected", () =>
+  rejects("UPDATE RESULT SET winning_team_id=losing_team_id WHERE match_id=1"));
+test("contradictory score rejected", () =>
+  rejects("UPDATE RESULT SET score='7-13' WHERE match_id=1"));
+test("negative kills rejected", () =>
+  rejects(
+    "UPDATE PLAYER_MATCH_STATS SET kills=-1 WHERE match_id=1 AND player_id=1",
+  ));
+test("negative deaths rejected", () =>
+  rejects(
+    "UPDATE PLAYER_MATCH_STATS SET deaths=-1 WHERE match_id=1 AND player_id=1",
+  ));
+test("negative assists rejected", () =>
+  rejects(
+    "UPDATE PLAYER_MATCH_STATS SET assists=-1 WHERE match_id=1 AND player_id=1",
+  ));
+test("negative damage rejected", () =>
+  rejects(
+    "UPDATE PLAYER_MATCH_STATS SET damage=-1 WHERE match_id=1 AND player_id=1",
+  ));
+test("future birth date rejected", () =>
+  rejects("UPDATE PLAYER SET date_of_birth=current_date+1 WHERE player_id=1"));
+test("blank username rejected", () =>
+  rejects("UPDATE PLAYER SET username='  ' WHERE player_id=1"));
+test("duplicate roster rejected", () =>
+  rejects(
+    "INSERT INTO TEAM_MEMBER(player_id,team_id,join_date) VALUES(1,2,'2026-01-01')",
+  ));
+test("wrong team player rejected", () =>
+  rejects("INSERT INTO PLAYED_BY VALUES(1,2,2)"));
+test("statistics without participation rejected", () =>
+  rejects(
+    "INSERT INTO PLAYER_MATCH_STATS(match_id,player_id) VALUES(1,2)",
+    [],
+    "23503",
+  ));
+test("invalid final position rejected", () =>
+  rejects(
+    "UPDATE PARTICIPATES_IN SET final_position=0 WHERE tournament_id=1 AND team_id=1",
+  ));
+test("duplicate position rejected", () =>
+  rejects(
+    "UPDATE PARTICIPATES_IN SET final_position=2 WHERE tournament_id=1 AND team_id=1",
+    [],
+    "23505",
+  ));
+test("excess final position rejected at constraint check", () =>
+  rollback(async (c) => {
+    await c.query(
+      "UPDATE PARTICIPATES_IN SET final_position=99 WHERE tournament_id=1 AND team_id=1",
+    );
+    await assert.rejects(c.query("SET CONSTRAINTS ALL IMMEDIATE"));
+  }));
+test("tournament shrink cannot invalidate matches", () =>
+  rejects(
+    "UPDATE TOURNAMENT SET start_date='2026-08-10' WHERE tournament_id=1",
+  ));
+test("registered opponents cannot be removed", () =>
+  rejects("DELETE FROM PARTICIPATES_IN WHERE tournament_id=1 AND team_id=1"));
+test("historic roster cannot be removed", () =>
+  rejects("DELETE FROM TEAM_MEMBER WHERE player_id=1"));
+test("direct opponent update cannot bypass registration checks", () =>
+  rejects("UPDATE MATCH_TEAM SET team_id=4 WHERE match_id=1 AND team_id=2"));
+test("direct registration identity update cannot orphan opponents", () =>
+  rejects(
+    "UPDATE PARTICIPATES_IN SET team_id=4 WHERE tournament_id=1 AND team_id=2",
+  ));
+test("standings view computes two wins and six points", async () => {
+  const r = (
+    await pool.query(
+      "SELECT * FROM tournament_standings WHERE tournament_id=1 AND team_id=1",
+    )
+  ).rows[0];
+  assert.equal(r.wins, 2);
+  assert.equal(r.points, 6);
+});
+test("stored function filters by tournament and computes KD", async () => {
+  const r = (
+    await pool.query("SELECT * FROM player_performance(1) WHERE player_id=1")
+  ).rows[0];
+  assert.equal(r.kills, 40);
+  assert.equal(r.kd, 2.11);
+  assert.equal(
+    (await pool.query("SELECT * FROM player_performance(2) WHERE player_id=1"))
+      .rowCount,
+    0,
+  );
+});
+test("result correction updates view and audit inside transaction", () =>
+  rollback(async (c) => {
+    await c.query(
+      "UPDATE RESULT SET winning_team_id=2,losing_team_id=1,score='13-10' WHERE match_id=1",
+    );
+    assert.equal(
+      (
+        await c.query(
+          "SELECT wins FROM tournament_standings WHERE tournament_id=1 AND team_id=1",
+        )
+      ).rows[0].wins,
+      1,
+    );
+    assert.ok(
+      (await c.query("SELECT 1 FROM audit_log WHERE operation='UPDATE'"))
+        .rowCount,
+    );
+  }));
+test("rollback restores writes and cache revision", async () => {
+  const before = (await pool.query("SELECT version FROM cache_revision"))
+    .rows[0].version;
+  await rollback(async (c) => {
+    await c.query("UPDATE PLAYER SET country='Changed' WHERE player_id=1");
+    assert.notEqual(
+      (await c.query("SELECT version FROM cache_revision")).rows[0].version,
+      before,
+    );
+  });
+  assert.equal(
+    (await pool.query("SELECT version FROM cache_revision")).rows[0].version,
+    before,
+  );
+});
+test("transactional scheduling creates exactly two opponents", () =>
+  rollback(async (c) => {
+    const id = (
+      await c.query("SELECT schedule_match(1,'2026-08-20','Final',1,2) AS id")
+    ).rows[0].id;
+    assert.equal(
+      (await c.query("SELECT count(*) FROM MATCH_TEAM WHERE match_id=$1", [id]))
+        .rows[0].count,
+      "2",
+    );
+    await c.query("SET CONSTRAINTS ALL IMMEDIATE");
+  }));
+test("incomplete match rejected at transaction boundary", () =>
+  rollback(async (c) => {
+    await c.query(
+      "INSERT INTO MATCH(tournament_id,match_date,round) VALUES(1,'2026-08-20','Invalid')",
+    );
+    await assert.rejects(c.query("SET CONSTRAINTS ALL IMMEDIATE"));
+  }));
+test("DDL CREATE ALTER DROP and DML INSERT UPDATE DELETE execute safely", () =>
+  rollback(async (c) => {
+    await c.query("CREATE TEMP TABLE ddl_demo(id integer PRIMARY KEY)");
+    await c.query("ALTER TABLE ddl_demo ADD COLUMN label text");
+    await c.query("INSERT INTO ddl_demo VALUES(1,'Before')");
+    await c.query("UPDATE ddl_demo SET label='After' WHERE id=1");
+    assert.equal(
+      (await c.query("SELECT label FROM ddl_demo")).rows[0].label,
+      "After",
+    );
+    await c.query("DELETE FROM ddl_demo");
+    assert.equal((await c.query("SELECT * FROM ddl_demo")).rowCount, 0);
+    await c.query("DROP TABLE ddl_demo");
+  }));
+test("JOIN GROUP BY HAVING aggregates subquery ORDER BY execute", async () => {
+  const r = await pool.query(
+    `SELECT p.username,sum(s.kills)::int AS kills FROM PLAYER p INNER JOIN PLAYER_MATCH_STATS s USING(player_id) LEFT JOIN TEAM_MEMBER tm USING(player_id) WHERE p.player_id IN(SELECT player_id FROM PLAYED_BY) GROUP BY p.player_id HAVING sum(s.kills)>20 ORDER BY kills DESC`,
+  );
+  assert.equal(r.rows[0].username, "ShadowAce");
+});
+test("query indexes exist", async () => {
+  const r = await pool.query(
+    "SELECT indexname FROM pg_indexes WHERE indexname IN('match_tournament_date_idx','stats_player_idx','roster_team_idx','unique_active_roster_idx')",
+  );
+  assert.equal(r.rowCount, 4);
+});
+test("password hashes are salted and verify without plaintext", async () => {
+  const password = "Only-a-test-generated-password";
+  const a = await hashPassword(password),
+    b = await hashPassword(password);
+  assert.notEqual(a, b);
+  assert.equal(a.includes(password), false);
+  assert.equal(await verifyPassword(password, a), true);
+  assert.equal(await verifyPassword("wrong", a), false);
+});

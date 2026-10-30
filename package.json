@@ -13,7 +13,8 @@
     "test:db": "tsx --test tests/database.test.ts",
     "test:api": "tsx --test tests/api.test.ts",
     "test:e2e": "playwright test",
-    "test:cache": "tsx --test tests/cache.test.ts"
+    "test:cache": "tsx --test tests/cache.test.ts",
+    "format:check": "prettier --check app components lib scripts tests next.config.ts playwright.config.ts package.json tsconfig.json compose.yaml .github/workflows docs/*.md"
   },
   "dependencies": {
     "next": "^15.5.28",
@@ -29,6 +30,7 @@
     "@types/pg": "^8.11.10",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.3.0",
+    "prettier": "^3.9.10",
     "tsx": "^4.23.15",
     "typescript": "^5.7.2"
   },

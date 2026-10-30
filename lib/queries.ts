@@ -12,7 +12,12 @@ export async function getDashboardCounts() {
              (SELECT COUNT(*)::int FROM TEAM)       AS teams,
              (SELECT COUNT(*)::int FROM TOURNAMENT) AS tournaments,
              (SELECT COUNT(*)::int FROM MATCH)      AS matches`);
-    return r.rows[0] as { players: number; teams: number; tournaments: number; matches: number };
+    return r.rows[0] as {
+      players: number;
+      teams: number;
+      tournaments: number;
+      matches: number;
+    };
   });
 }
 
@@ -24,7 +29,7 @@ export async function listPlayers(q: string) {
        FROM PLAYER
        WHERE username ILIKE $1 OR country ILIKE $1 OR role ILIKE $1
        ORDER BY username`,
-      [`%${q}%`]
+      [`%${q}%`],
     );
     return r.rows;
   });
@@ -69,9 +74,13 @@ export async function getTournamentDetail(id: number) {
         `SELECT t.name, g.title AS game, t.start_date::text AS start_date,
                 t.end_date::text AS end_date, t.prize_pool::float AS prize_pool
          FROM TOURNAMENT t JOIN GAME g ON g.game_id = t.game_id
-         WHERE t.tournament_id = $1`, [id]),
+         WHERE t.tournament_id = $1`,
+        [id],
+      ),
       pool.query(
-        `SELECT * FROM tournament_standings WHERE tournament_id=$1 ORDER BY points DESC, wins DESC, team_name`, [id]),
+        `SELECT * FROM tournament_standings WHERE tournament_id=$1 ORDER BY points DESC, wins DESC, team_name`,
+        [id],
+      ),
       pool.query(
         `SELECT m.match_id, m.round, m.match_date::text AS match_date, r.score,
                 w.team_name AS winner, l.team_name AS loser
@@ -80,9 +89,15 @@ export async function getTournamentDetail(id: number) {
          LEFT JOIN TEAM w ON w.team_id = r.winning_team_id
          LEFT JOIN TEAM l ON l.team_id = r.losing_team_id
          WHERE m.tournament_id = $1
-         ORDER BY m.match_date, m.match_id`, [id]),
+         ORDER BY m.match_date, m.match_id`,
+        [id],
+      ),
     ]);
-    return { tournament: tour.rows[0] ?? null, teams: teams.rows, matches: matches.rows };
+    return {
+      tournament: tour.rows[0] ?? null,
+      teams: teams.rows,
+      matches: matches.rows,
+    };
   });
 }
 
@@ -103,15 +118,23 @@ export async function listMatches() {
   });
 }
 
-export async function getPlayerStats(tournamentId:number|null=null) {
- await pageUser();
- return cachedQuery(`stats:${tournamentId}`,60,async()=> (await pool.query('SELECT * FROM player_performance($1)',[tournamentId])).rows);
+export async function getPlayerStats(tournamentId: number | null = null) {
+  await pageUser();
+  return cachedQuery(
+    `stats:${tournamentId}`,
+    60,
+    async () =>
+      (await pool.query("SELECT * FROM player_performance($1)", [tournamentId]))
+        .rows,
+  );
 }
 
 export async function listRoster() {
- await pageUser();
- return (await pool.query(`SELECT tm.*,tm.join_date::text AS join_date,tm.leave_date::text AS leave_date,p.username,t.team_name
- FROM TEAM_MEMBER tm JOIN PLAYER p USING(player_id) JOIN TEAM t USING(team_id) ORDER BY t.team_name,p.username,tm.join_date`)).rows;
+  await pageUser();
+  return (
+    await pool.query(`SELECT tm.*,tm.join_date::text AS join_date,tm.leave_date::text AS leave_date,p.username,t.team_name
+ FROM TEAM_MEMBER tm JOIN PLAYER p USING(player_id) JOIN TEAM t USING(team_id) ORDER BY t.team_name,p.username,tm.join_date`)
+  ).rows;
 }
 
 /** Dropdown options for the forms; cached for longer because they change rarely. */
@@ -119,10 +142,18 @@ export async function getLookups() {
   await pageUser();
   return cachedQuery("lookups", 120, async () => {
     const [games, teams, players, tournaments, matches] = await Promise.all([
-      pool.query(`SELECT game_id AS value, title AS label FROM GAME ORDER BY title`),
-      pool.query(`SELECT team_id AS value, team_name AS label FROM TEAM ORDER BY team_name`),
-      pool.query(`SELECT player_id AS value, username AS label FROM PLAYER ORDER BY username`),
-      pool.query(`SELECT tournament_id AS value, name AS label FROM TOURNAMENT ORDER BY name`),
+      pool.query(
+        `SELECT game_id AS value, title AS label FROM GAME ORDER BY title`,
+      ),
+      pool.query(
+        `SELECT team_id AS value, team_name AS label FROM TEAM ORDER BY team_name`,
+      ),
+      pool.query(
+        `SELECT player_id AS value, username AS label FROM PLAYER ORDER BY username`,
+      ),
+      pool.query(
+        `SELECT tournament_id AS value, name AS label FROM TOURNAMENT ORDER BY name`,
+      ),
       pool.query(`SELECT match_id AS value, 'Match #' || match_id || ' (' || round || ')' AS label
                   FROM MATCH ORDER BY match_id`),
     ]);

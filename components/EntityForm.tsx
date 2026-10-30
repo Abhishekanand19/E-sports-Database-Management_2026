@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useTransition, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
-import { useUser } from './SessionProvider';
+import { useState, type FormEvent } from "react";
+import { useUser } from "./SessionProvider";
 
 export type Field = {
   name: string;
@@ -21,24 +20,22 @@ export default function EntityForm({
   title,
   endpoint,
   fields,
-  method = 'POST',
+  method = "POST",
   reset = true,
 }: {
   title: string;
   endpoint: string;
   fields: Field[];
-  method?: 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  method?: "POST" | "PUT" | "PATCH" | "DELETE";
   reset?: boolean;
 }) {
-  const router = useRouter();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [busy, setBusy] = useState(false);
-  const [refreshing,startTransition]=useTransition();
-  const user=useUser();
-  if(user?.role!=='admin') return null;
+  const user = useUser();
+  if (user?.role !== "admin") return null;
 
-    async function onSubmit(e: FormEvent<HTMLFormElement>) {
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formEl = e.currentTarget; // keep a reference before any await
     setError("");
@@ -52,27 +49,32 @@ export default function EntityForm({
       const text = raw === null ? "" : String(raw);
       if (f.type === "hidden") body[f.name] = f.value;
       else if (text === "") body[f.name] = null;
-      else body[f.name] = f.type === "number" || f.numeric ? Number(text) : text;
+      else
+        body[f.name] = f.type === "number" || f.numeric ? Number(text) : text;
     }
 
     try {
-    const res = await fetch(endpoint, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    const json = await res.json();
-    setBusy(false);
+      const res = await fetch(endpoint, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const json = await res.json();
+      setBusy(false);
 
-    if (!res.ok) {
-      setError(json.error ?? "Something went wrong");
-      return;
+      if (!res.ok) {
+        setError(json.error ?? "Something went wrong");
+        return;
+      }
+      setSuccess("Saved!");
+      if (reset) formEl.reset();
+      // A document refresh also discards prefetched page/lookup payloads after a write.
+      window.location.reload();
+    } catch {
+      setError("Unable to connect. Please retry.");
+    } finally {
+      setBusy(false);
     }
-    setSuccess("Saved!");
-    if(reset) formEl.reset();
-    startTransition(()=>router.refresh());
-    } catch { setError('Unable to connect. Please retry.'); }
-    finally {setBusy(false);}
   }
 
   return (
@@ -85,7 +87,12 @@ export default function EntityForm({
           <label key={f.name}>
             {f.label}
             {f.type === "select" ? (
-              <select aria-label={f.label} name={f.name} required={f.required ?? true} defaultValue={f.defaultValue ?? ''}>
+              <select
+                aria-label={f.label}
+                name={f.name}
+                required={f.required ?? true}
+                defaultValue={f.defaultValue ?? ""}
+              >
                 <option value="">-- choose --</option>
                 {f.options?.map((o) => (
                   <option key={o.value} value={o.value}>
@@ -100,18 +107,26 @@ export default function EntityForm({
                 type={f.type ?? "text"}
                 step={f.step}
                 defaultValue={f.defaultValue}
-                min={f.type==='number'?0:undefined}
+                min={f.type === "number" ? 0 : undefined}
                 required={f.required ?? true}
               />
             )}
           </label>
-        )
+        ),
       )}
-      <button type="submit" disabled={busy||refreshing}>
-        {busy||refreshing ? "Saving..." : "Save"}
+      <button type="submit" disabled={busy}>
+        {busy ? "Saving..." : "Save"}
       </button>
-      {error && <p className="error" role="alert">{error}</p>}
-      {success && <p className="success" role="status">{success}</p>}
+      {error && (
+        <p className="error" role="alert">
+          {error}
+        </p>
+      )}
+      {success && (
+        <p className="success" role="status">
+          {success}
+        </p>
+      )}
     </form>
   );
 }

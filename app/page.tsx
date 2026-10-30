@@ -14,7 +14,9 @@ export default async function HomePage() {
   return (
     <>
       <h1>Esports Tournament & Player Management</h1>
-      <p className="muted">Manage players, teams, tournaments, matches and performance stats.</p>
+      <p className="muted">
+        Manage players, teams, tournaments, matches and performance stats.
+      </p>
       <div className="grid-cards">
         {cards.map((c) => (
           <div key={c.label} className="card">
