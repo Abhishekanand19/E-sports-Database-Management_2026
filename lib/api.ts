@@ -21,6 +21,11 @@ export function dbErrorResponse(err: unknown) {
     "23514": [400, "A value breaks a data rule (check constraint)"],
     "22P02": [400, "Invalid input format"],
     "22007": [400, "Invalid date format"],
+    "22008": [400, "Invalid calendar date"],
+    "22003": [400, "Number is outside the supported range"],
+    "23502": [400, "A required value is missing"],
+    "40001": [409, "Concurrent change; please retry"],
+    "40P01": [409, "Concurrent change; please retry"],
   };
   const [status, error] = messages[code ?? ""] ?? [500, "Database error"];
   if (status === 500) console.error(err);
